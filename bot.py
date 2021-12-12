@@ -5,7 +5,7 @@ bot = telebot.TeleBot(TOKEN)
 def start_message(message):
     bot.send_message(message.chat.id,
                      'Привет, я бот умеющий делать напоминания!', reply_markup=get_keyboard())
-@bot.callback_query_handler(func=lambda x: x.date == "set timer")
+@bot.callback_query_handler(func=lambda x: x.data == "set timer")
 def presettimer(query):
     message = query.message
     bot.send_message(message.chat.id, "Введите один из пресетов таймера:\n"
