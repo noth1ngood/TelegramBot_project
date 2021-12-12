@@ -41,9 +41,21 @@ def settext(message, times):
     cur_date += izmdate
     users[message.chat.id] = (cur_date, message.text)
     bot.send_message(message.chat.id,
-                     'Через заданное время вам придет заданыый текст')
-def checkdate():
-    pass
+                     'Через заданное время вам придет заданный текст')
+
+def check_date():
+    nowdate = datetime.datetime.now()
+    delusers = []
+    for chat_id, value in users.items():
+        timer = value[0]
+        message = value[1]
+        if nowdate >= timer:
+            bot.send_message(chat_id, message)
+            delusers.append(chat_id)
+    for user in delusers:
+        del users[user]
+    threading.Timer(1, check_date).start()
+
 def get_keyboard():
     keyboard = telebot.types.InlineKeyboardMarkup()
     button = telebot.types.InlineKeyboardButton("Установить таймер", callback_data='set timer')
@@ -55,5 +67,6 @@ if __name__ == "__main__":
     while True:
         try:
             bot.polling()
+            check_date()
         except:
             print("Что-то сломалось")
