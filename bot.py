@@ -14,8 +14,23 @@ def presettimer(query):
                      "3: n час")
     bot.register_next_step_handler(message, settime)
 def settime(message):
+    times = {
+        'cek': 0,
+        'мин': 0,
+        'час': 0
+    }
+    quantity, type_time = message.text.split()
+    if type_time not in times.keys():
+        bot.send_message(message.chat.id,
+                         'Вы ввели неверный тип времени')
+    return
+    if not quantity.isdigit():
+        bot.send_message(message.chat.id,
+                         'Вы ввели не численнленное значение времени')
+    times[type_time] = int(quantity)
+    presettext(message, times)
+def presettext(message, times):
     pass
-
 
 def get_keyboard():
     keyboard = telebot.types.InlineKeyboardMarkup()
