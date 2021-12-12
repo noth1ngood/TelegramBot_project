@@ -1,4 +1,5 @@
 import telebot
+import threading
 import datetime
 from config import TOKEN
 bot = telebot.TeleBot(TOKEN)
@@ -24,7 +25,7 @@ def settime(message):
     if type_time not in times.keys():
         bot.send_message(message.chat.id,
                          'Вы ввели неверный тип времени')
-    return
+
     if not quantity.isdigit():
         bot.send_message(message.chat.id,
                          'Вы ввели не численнленное значение времени')
@@ -41,6 +42,8 @@ def settext(message, times):
     users[message.chat.id] = (cur_date, message.text)
     bot.send_message(message.chat.id,
                      'Через заданное время вам придет заданыый текст')
+def checkdate():
+    pass
 def get_keyboard():
     keyboard = telebot.types.InlineKeyboardMarkup()
     button = telebot.types.InlineKeyboardButton("Установить таймер", callback_data='set timer')
