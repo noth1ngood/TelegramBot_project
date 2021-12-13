@@ -3,10 +3,22 @@ import threading
 import datetime
 from config import TOKEN
 bot = telebot.TeleBot(TOKEN)
+
 @bot.message_handler(commands=['start'])
 def start_message(message):
     bot.send_message(message.chat.id,
                      'Привет, я бот умеющий делать напоминания!', reply_markup=get_keyboard())
+
+@bot.message_handler(commands=['url'])
+def url(message):
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    url_button1 = telebot.types.InlineKeyboardButton(text="Расписание", url="https://ruz.hse.ru/ruz/main")
+    url_button2 = telebot.types.InlineKeyboardButton(text="Библиотека", url="https://library.hse.ru/")
+    url_button3 = telebot.types.InlineKeyboardButton(text="Smart LMS", url="https://smartedu.hse.ru/login?target=/")
+    keyboard.add(url_button1, url_button2, url_button3)
+    bot.send_message(message.chat.id,
+                     'Выберите сайт, на который вы хотите перейти', reply_markup=keyboard)
+
 @bot.callback_query_handler(func=lambda x: x.data == "set timer")
 def presettimer(query):
     message = query.message
@@ -31,10 +43,12 @@ def settime(message):
                          'Вы ввели не численнленное значение времени')
     times[type_time] = int(quantity)
     presettext(message, times)
+
 def presettext(message, times):
     bot.send_message(message.chat.id,
-                     'Введите текст, который вы хотите получить через данное время')
+                     'Введите текст, который вы хотите получить через заданное время')
     bot.register_next_step_handler(message, settext, times)
+
 def settext(message, times):
     cur_date = datetime.datetime.now()
     izmdate = datetime.timedelta(days=0, hours=times['час'], minutes=times['мин'], seconds=times['сек'])
