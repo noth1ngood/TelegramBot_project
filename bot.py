@@ -1,15 +1,28 @@
 import telebot
 import threading
 import datetime
+import sqlite3
 from config import TOKEN
+
 bot = telebot.TeleBot(TOKEN)
+
+conn = sqlite3.connect('users.db', check_same_thread=False)
+cursor = conn.cursor()
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    bot.send_message(message.chat.id,
-                     'Привет, я бот умеющий делать напоминания!', reply_markup=get_keyboard())
 
-@bot.message_handler(commands=['url'])
+    bot.send_message(message.chat.id,
+                     "Добро пожаловать, {0.first_name}!\nЯ - <b>{1.first_name}</b>, бот созданный, чтобы упростить жизнь моего создателя.".format(
+                         message.from_user, bot.get_me()),
+                     parse_mode='html')
+    bot.send_message(message.chat.id,
+                     "Я могу устанавливать таймеры с нужной для вас информацией",
+                     reply_markup=get_keyboard())
+    bot.send_message(message.chat.id,
+                     "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")
+
+@bot.message_handler(commands=['url', 'Url', 'u'])
 def url(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
     url_button1 = telebot.types.InlineKeyboardButton(text="Расписание", url="https://ruz.hse.ru/ruz/main")
@@ -64,7 +77,7 @@ def check_date():
         timer = value[0]
         message = value[1]
         if nowdate >= timer:
-            bot.send_message(chat_id, message)
+            bot.send_message(chat_id, "Ваше напоминание: \n" + message)
             delusers.append(chat_id)
     for user in delusers:
         del users[user]
@@ -80,7 +93,7 @@ if __name__ == "__main__":
     users = {}
     while True:
         try:
-            bot.polling()
+            bot.polling(non_stop=True)
             check_date()
         except:
             print("Что-то сломалось")
