@@ -5,6 +5,7 @@ import sqlite3 as lite
 from config import TOKEN
 from database import BotDB
 bot = telebot.TeleBot(TOKEN)
+
 @bot.message_handler(commands=['start'])
 def start_message(message):
     bot.send_message(message.chat.id,
@@ -16,17 +17,6 @@ def start_message(message):
                      reply_markup=get_keyboard())
     bot.send_message(message.chat.id,
                      "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")
-    user_id = message.from_user.id
-    conn = lite.connect('database.db')
-    cursor = conn.cursor()
-
-    cur = conn.cursor()
-        # Создаем таблицу
-    cur.execute("CREATE TABLE Userss(Id INT)")
-    conn.commit()
-        # Вносим данные
-    cur.execute("INSERT INTO Userss VALUES(user_id)")
-    conn.commit()
 @bot.message_handler(commands=['url', 'Url', 'u'])
 def url(message):
     keyboard = telebot.types.InlineKeyboardMarkup()

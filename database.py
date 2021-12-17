@@ -1,7 +1,7 @@
 import sqlite3
 
 class BotDB:
-    con = sqlite3.connect('database.db')
+    con = sqlite3.connect('')
     cursor = con.cursor()
     with con:
         def add_user(self, user_id):
