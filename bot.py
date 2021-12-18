@@ -5,9 +5,30 @@ import sqlite3 as lite
 from config import TOKEN
 from database import BotDB
 bot = telebot.TeleBot(TOKEN)
+conn = lite.connect("Users.db", check_same_thread=False)
+cursor = conn.cursor()
+"""функция добавляющая данные пользователя в таблицу test"""
+def dbtableval(user_id: int, user_name: str, user_surname: str, username: str):
+    """
 
+    :param user_id: id пользователя
+    :param user_name: имя пользователя
+    :param user_surname: фамилия пользователя
+    :param username: ник пользователя
+    :return: добавляет данные пользователя в таблицу test, которая находится в Users.db
+    """
+    cursor.execute('INSERT INTO test (user_id, user_surname, username) VALUES (?, ?, ?, ?)', (user_id, user_name, user_surname, username))
+    conn.commit()
+    print("данные добавлены")
+"""раздел, обрабатывающий команду Start"""
 @bot.message_handler(commands=['start'])
-def start_message(message):
+def start_message(message): #функция, обрабатывающая команду start
+
+    """
+    :param message: принимает
+    :return: три сообщения с прикреппленной кнопкой
+    """
+
     bot.send_message(message.chat.id,
                      "Добро пожаловать, {0.first_name}!\nЯ - <b>{1.first_name}</b>, бот созданный, чтобы упростить жизнь моего создателя.".format(
                          message.from_user, bot.get_me()),
@@ -17,8 +38,30 @@ def start_message(message):
                      reply_markup=get_keyboard())
     bot.send_message(message.chat.id,
                      "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")
+@bot.message_handler(content_types=['text'])
+def getnote(message):
+    """
+
+    :param message: принимает на вход сообщение пользователя
+    :return: сообщение
+    """
+    if message.text.lower() == "запиши":
+        bot.send_message(message.from_user.id, "{0.first_name}!\n Я записал ваши данные в базу данных".format(
+            message.from_user, bot.get_me(), parse_mode='html'))
+
+        us_id = message.from_user.id
+        us_name = message.from_user.first_name
+        us_surname = message.from_user.last_name
+        username = message.from_user.username
+
+        dbtableval(user_id=us_id, user_name=us_name, user_surname=us_surname, username=username)
 @bot.message_handler(commands=['url', 'Url', 'u'])
 def url(message):
+    """
+
+    :param message: сообщение
+    :return: три кнопки, привязпнные к сообщению
+    """
     keyboard = telebot.types.InlineKeyboardMarkup()
     url_button1 = telebot.types.InlineKeyboardButton(text="Расписание", url="https://ruz.hse.ru/ruz/main")
     url_button2 = telebot.types.InlineKeyboardButton(text="Библиотека", url="https://library.hse.ru/")
@@ -29,6 +72,11 @@ def url(message):
 
 @bot.callback_query_handler(func=lambda x: x.data == "set timer")
 def presettimer(query):
+    """
+
+    :param query: запрос на установление таймера-напоминалки
+    :return:
+    """
     message = query.message
     bot.send_message(message.chat.id, "Введите один из пресетов таймера:\n"
                      "1: n сек\n"
@@ -36,6 +84,11 @@ def presettimer(query):
                      "3: n час")
     bot.register_next_step_handler(message, settime)
 def settime(message):
+    """
+
+    :param message: данные, которые отображают время на которое устанавливается уведомление
+    :return:
+    """
     times = {
         'сек': 0,
         'мин': 0,
@@ -53,11 +106,23 @@ def settime(message):
     presettext(message, times)
 
 def presettext(message, times):
+    """
+
+    :param message: данные, по которым устанавливается таймер
+    :param times: численное значение времени в секундах, на которое ставится таймер
+    :return:
+    """
     bot.send_message(message.chat.id,
                      'Введите текст, который вы хотите получить через заданное время')
     bot.register_next_step_handler(message, settext, times)
 
 def settext(message, times):
+    """
+
+    :param message: данные, по которым ставится будильник
+    :param times: численное значение таймера
+    :return: сообщение об успешном установлении таймера
+    """
     cur_date = datetime.datetime.now()
     izmdate = datetime.timedelta(days=0, hours=times['час'], minutes=times['мин'], seconds=times['сек'])
     cur_date += izmdate
@@ -66,6 +131,10 @@ def settext(message, times):
                      'Через заданное время вам придет заданный текст')
 
 def check_date():
+    """
+
+    :return: напоминание с указанным текстом
+    """
     nowdate = datetime.datetime.now()
     delusers = []
     for chat_id, value in users.items():
@@ -79,6 +148,10 @@ def check_date():
     threading.Timer(1, check_date).start()
 
 def get_keyboard():
+    """
+
+    :return: возвращает клавиатуру
+    """
     keyboard = telebot.types.InlineKeyboardMarkup()
     button = telebot.types.InlineKeyboardButton("Установить таймер", callback_data='set timer')
     keyboard.add(button)
