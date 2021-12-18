@@ -1,6 +1,7 @@
 import telebot
 import threading
 import datetime
+import xlrd
 import sqlite3 as lite
 from config import TOKEN
 from database import BotDB
@@ -56,15 +57,26 @@ def getnote(message):
 
         dbtableval(user_id=us_id, user_name=us_name, user_surname=us_surname, username=username)
         '''
-@bot.message_handler(commands=['books'])
+@bot.message_handler(commands=['books', 'Books', 'notes', 'Notes'])
 def send_welcome(message):
     keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
     button1 = telebot.types.KeyboardButton("Вывести заметки из Exel")
     button2 = telebot.types.KeyboardButton("Книги")
     keyboard.add(button1, button2)
 
-    bot.send_message(message.chat.id, "Выбирай, {0.first_name}\n".format(message.from_user),parse_mode='html',reply_markup=keyboard)
-
+    bot.send_message(message.chat.id, "Выбирай, {0.first_name}\n".format(message.from_user),parse_mode='html', reply_markup=keyboard)
+@bot.message_handler(func=lambda message: True)
+def choose(message):
+    if message.chat.type == "private":
+        if message.text == "Вывести заметки из Exel":
+            notes = xlrd.open_workbook('Notes.xls', formatting_info=True)
+            list = notes.sheet_by_index(0)
+            row = list.row_values(0)
+            bot.send_message(message.chat.id, row)
+        elif message.text == "Книги":
+            bot.send_message(message.chat.id, "не доделано")
+        else:
+            bot.send_message(message.chat.id, "Затрудняюсь ответить")
 @bot.message_handler(commands=['url', 'Url', 'u'])
 def url(message):
     """
