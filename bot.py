@@ -71,15 +71,7 @@ def settime(message):
         bot.send_message(message.chat.id,
                          'Вы ввели не численнленное значение времени')
     times[type_time] = int(kolvo)
-    presettext(message, times)
 
-def presettext(message, times):
-    """
-
-    :param message: данные, по которым устанавливается таймер
-    :param times: численное значение времени в секундах, на которое ставится таймер
-    :return:
-    """
     bot.send_message(message.chat.id,
                      'Введите текст, который вы хотите получить через заданное время')
     bot.register_next_step_handler(message, settext, times)
