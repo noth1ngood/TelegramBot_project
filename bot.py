@@ -9,6 +9,7 @@ bot = telebot.TeleBot(TOKEN)
 def start_message(message): #функция, обрабатывающая команду start
 
     """
+    функция, которая отвечает на команду /start.
     :param message: принимает
     :return: три сообщения с прикреппленной кнопкой
     """
@@ -26,7 +27,7 @@ def start_message(message): #функция, обрабатывающая ком
 @bot.message_handler(commands=['url', 'Url', 'u'])
 def url(message):
     """
-
+    Функция обрабатывает команду /url, /Url, /u
     :param message: сообщение
     :return: три кнопки, привязпнные к сообщению
     """
@@ -41,7 +42,7 @@ def url(message):
 @bot.callback_query_handler(func=lambda x: x.data == "set timer")
 def presettimer(query):
     """
-
+    Функция возвращает пользователю пример установки времени для таймера
     :param query: запрос на установление таймера-напоминалки
     :return:
     """
@@ -53,9 +54,9 @@ def presettimer(query):
     bot.register_next_step_handler(message, settime)
 def settime(message):
     """
-
+    принимает message и проверяет правильность заполнения данных, далее отсылает сообщение
     :param message: данные, которые отображают время на которое устанавливается уведомление
-    :return:
+    :return: сообщение о задании текста напоминания
     """
     times = {
         'сек': 0,
@@ -78,7 +79,8 @@ def settime(message):
 
 def settext(message, times):
     """
-
+    функция высчитывает время в будущем, при наступлении которого придет уведомление. Также она записыввет в users
+    время уведомления и текст уведомления для определенного пользователя
     :param message: данные, по которым ставится будильник
     :param times: численное значение таймера
     :return: сообщение об успешном установлении таймера
@@ -92,7 +94,8 @@ def settext(message, times):
 
 def check_date():
     """
-
+    Функция следит за наступлением времени, при котором надо бдует отправить уведомление, также чтобы не захламлять память
+    она удаляет из users все данные
     :return: напоминание с указанным текстом
     """
     nowdate = datetime.datetime.now()
