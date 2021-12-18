@@ -38,7 +38,7 @@ def start_message(message): #функция, обрабатывающая ком
                      reply_markup=get_keyboard())
     bot.send_message(message.chat.id,
                      "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")
-@bot.message_handler(content_types=['text'])
+'''@bot.message_handler(content_types=['text'])
 def getnote(message):
     """
 
@@ -55,6 +55,16 @@ def getnote(message):
         username = message.from_user.username
 
         dbtableval(user_id=us_id, user_name=us_name, user_surname=us_surname, username=username)
+        '''
+@bot.message_handler(commands=['books'])
+def send_welcome(message):
+    keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = telebot.types.KeyboardButton("Вывести заметки из Exel")
+    button2 = telebot.types.KeyboardButton("Книги")
+    keyboard.add(button1, button2)
+
+    bot.send_message(message.chat.id, "Выбирай, {0.first_name}\n".format(message.from_user),parse_mode='html',reply_markup=keyboard)
+
 @bot.message_handler(commands=['url', 'Url', 'u'])
 def url(message):
     """
@@ -62,7 +72,7 @@ def url(message):
     :param message: сообщение
     :return: три кнопки, привязпнные к сообщению
     """
-    keyboard = telebot.types.InlineKeyboardMarkup()
+    keyboard = telebot.types.InlineKeyboardMarkup(row_width=1)
     url_button1 = telebot.types.InlineKeyboardButton(text="Расписание", url="https://ruz.hse.ru/ruz/main")
     url_button2 = telebot.types.InlineKeyboardButton(text="Библиотека", url="https://library.hse.ru/")
     url_button3 = telebot.types.InlineKeyboardButton(text="Smart LMS", url="https://smartedu.hse.ru/login?target=/")
