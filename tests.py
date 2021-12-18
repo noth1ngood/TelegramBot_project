@@ -41,7 +41,7 @@ class TG_test(unittest.TestCase):
             self.assertRegex(m, text)
         except:
             self.assertFalse(True)
-    def testurl5(self):
+    def testurl7(self):
         try:
             client.send_message('@He1per_4u_bot', '/books')
             time.sleep(2)
@@ -49,7 +49,7 @@ class TG_test(unittest.TestCase):
             for message in client.get_messages('@He1per_4u_bot', limit=1):
                 m = message.message
             self.assertEqual(len(messages), 1)
-            text = f'Выберите сайт, на который вы хотите перейти'
+            text = f'Выбирай'
             self.assertRegex(m, text)
         except:
             self.assertFalse(True)
