@@ -2,25 +2,8 @@ import telebot
 import threading
 import datetime
 import xlrd
-import sqlite3 as lite
 from config import TOKEN
-from database import BotDB
 bot = telebot.TeleBot(TOKEN)
-conn = lite.connect("Users.db", check_same_thread=False)
-cursor = conn.cursor()
-"""функция добавляющая данные пользователя в таблицу test"""
-def dbtableval(user_id: int, user_name: str, user_surname: str, username: str):
-    """
-
-    :param user_id: id пользователя
-    :param user_name: имя пользователя
-    :param user_surname: фамилия пользователя
-    :param username: ник пользователя
-    :return: добавляет данные пользователя в таблицу test, которая находится в Users.db
-    """
-    cursor.execute('INSERT INTO test (user_id, user_surname, username) VALUES (?, ?, ?, ?)', (user_id, user_name, user_surname, username))
-    conn.commit()
-    print("данные добавлены")
 """раздел, обрабатывающий команду Start"""
 @bot.message_handler(commands=['start'])
 def start_message(message): #функция, обрабатывающая команду start
@@ -39,44 +22,7 @@ def start_message(message): #функция, обрабатывающая ком
                      reply_markup=get_keyboard())
     bot.send_message(message.chat.id,
                      "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")
-'''@bot.message_handler(content_types=['text'])
-def getnote(message):
-    """
 
-    :param message: принимает на вход сообщение пользователя
-    :return: сообщение
-    """
-    if message.text.lower() == "запиши":
-        bot.send_message(message.from_user.id, "{0.first_name}!\n Я записал ваши данные в базу данных".format(
-            message.from_user, bot.get_me(), parse_mode='html'))
-
-        us_id = message.from_user.id
-        us_name = message.from_user.first_name
-        us_surname = message.from_user.last_name
-        username = message.from_user.username
-
-        dbtableval(user_id=us_id, user_name=us_name, user_surname=us_surname, username=username)
-        '''
-@bot.message_handler(commands=['books', 'Books', 'notes', 'Notes'])
-def send_welcome(message):
-    keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = telebot.types.KeyboardButton("Вывести заметки из Exel")
-    button2 = telebot.types.KeyboardButton("Книги")
-    keyboard.add(button1, button2)
-
-    bot.send_message(message.chat.id, "Выбирай, {0.first_name}\n".format(message.from_user),parse_mode='html', reply_markup=keyboard)
-@bot.message_handler(func=lambda message: True)
-def choose(message):
-    if message.chat.type == "private":
-        if message.text == "Вывести заметки из Exel":
-            notes = xlrd.open_workbook('Notes.xls', formatting_info=True)
-            list = notes.sheet_by_index(0)
-            row = list.row_values(0)
-            bot.send_message(message.chat.id, row)
-        elif message.text == "Книги":
-            bot.send_message(message.chat.id, "не доделано")
-        else:
-            bot.send_message(message.chat.id, "Затрудняюсь ответить")
 @bot.message_handler(commands=['url', 'Url', 'u'])
 def url(message):
     """
@@ -116,15 +62,15 @@ def settime(message):
         'мин': 0,
         'час': 0
     }
-    quantity, type_time = message.text.split()
+    kolvo, type_time = message.text.split()
     if type_time not in times.keys():
         bot.send_message(message.chat.id,
                          'Вы ввели неверный тип времени')
 
-    if not quantity.isdigit():
+    if not kolvo.isdigit():
         bot.send_message(message.chat.id,
                          'Вы ввели не численнленное значение времени')
-    times[type_time] = int(quantity)
+    times[type_time] = int(kolvo)
     presettext(message, times)
 
 def presettext(message, times):
@@ -178,7 +124,39 @@ def get_keyboard():
     button = telebot.types.InlineKeyboardButton("Установить таймер", callback_data='set timer')
     keyboard.add(button)
     return keyboard
+@bot.message_handler(commands=['books', 'Books', 'notes', 'Notes'])
+def send_welcome(message):
+    '''
 
+    :param message: команда, которая запускает данную функцию
+    :return: клавиатуру, с двумя кнопками
+    '''
+    keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = telebot.types.KeyboardButton("Вывести заметки из Exel")
+    button2 = telebot.types.KeyboardButton("Книги")
+    keyboard.add(button1, button2)
+
+    bot.send_message(message.chat.id, "Выбирай, {0.first_name}\n".format(message.from_user),parse_mode='html', reply_markup=keyboard)
+@bot.message_handler(func=lambda message: True)
+def choose(message):
+    """
+
+    :param message: на вход идет либо "книги", либо "вывести заметки из Exel"
+    :return: выводит либо содержимое таблицы Exel, либо список книг
+    """
+    if message.chat.type == "private":
+        if message.text == "Вывести заметки из Exel":
+            notes = xlrd.open_workbook('Notes.xls', formatting_info=True)
+            list = notes.sheet_by_index(0)
+            for i in range(list.nrows):
+                row = list.row_values(i)
+                bot.send_message(message.chat.id, row)
+        elif message.text == "Книги":
+            bot.send_message(message.chat.id, "Выбор не велик, но библиотека постоянно пополняется!\n"
+                                              "И.Сивухин. Основной курс физики\n"
+                                              "Акулов. Курс по информатике")
+        else:
+            bot.send_message(message.chat.id, "Затрудняюсь ответить")
 if __name__ == "__main__":
     users = {}
     while True:

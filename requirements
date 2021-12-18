@@ -1,0 +1,4 @@
+TelegramBotApi == 0.3.2
+DateTime == 4.3
+xlrd == 2.0.1
+threading
