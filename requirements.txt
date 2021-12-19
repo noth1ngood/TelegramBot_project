@@ -1,0 +1,2 @@
+DateTime~=4.3
+xlrd~=2.0.1

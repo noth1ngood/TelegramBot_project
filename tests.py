@@ -1,101 +1,35 @@
-from telethon import TelegramClient, sync, events
-from telethon.tl.functions.channels import GetMessagesRequest
 import unittest
 import time
-
-
-
-
-# Your API ID, hash and session string here
-api_id = int('12674599')
-api_hash = "5750f9474e9b797d9442f442797fbcca"
-client = TelegramClient('session_name', api_id, api_hash)
-
-
-client.start()
+from unittest import mock
+from unittest.mock import MagicMock, ANY, call
+import bot
 
 
 class TG_test(unittest.TestCase):
-    def testStart(self):
-        try:
-            client.send_message('@He1per_4u_bot', '/start')
-            time.sleep(2)
-            messages = client.get_messages('@He1per_4u_bot')
-            for message in client.get_messages('@He1per_4u_bot', limit=3):
-                m = message.message
-            self.assertEqual(len(messages), 1)
-            text = f'Добро пожаловать'
-            self.assertRegex(m, text)
-        except:
-            self.assertFalse(True)
+    @mock.patch('bot.bot')
+    def test_start(self, bot_bot):
+        name = 'test'
+        user = MagicMock(first_name=name)
+        chat = MagicMock(id=123)
+        message = MagicMock(from_user=user, chat=chat)
+        bot_bot.get_me.return_value = MagicMock(first_name='bot')
+        bot.start_message(message)
+        calls = [call(123, "Добро пожаловать, test!\nЯ - <b>bot</b>, бот созданный, чтобы упростить жизнь моего создателя.", parse_mode='html'),
+                 call(123, "Я могу устанавливать таймеры с нужной для вас информацией", reply_markup=ANY),
+                 call(123, "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")]
+        bot_bot.send_message.assert_has_calls(calls)
 
-    def testurl(self):
-        try:
-            client.send_message('@He1per_4u_bot', '/url')
-            time.sleep(2)
-            messages = client.get_messages('@He1per_4u_bot')
-            for message in client.get_messages('@He1per_4u_bot', limit=1):
-                m = message.message
-            self.assertEqual(len(messages), 1)
-            text = f'Выберите сайт, на который вы хотите перейти'
-            self.assertRegex(m, text)
-        except:
-            self.assertFalse(True)
-    def testurl7(self):
-        try:
-            client.send_message('@He1per_4u_bot', '/books')
-            time.sleep(2)
-            messages = client.get_messages('@He1per_4u_bot')
-            for message in client.get_messages('@He1per_4u_bot', limit=1):
-                m = message.message
-            self.assertEqual(len(messages), 1)
-            text = f'Выбирай'
-            self.assertRegex(m, text)
-        except:
-            self.assertFalse(True)
-    def testurl2(self):
-        try:
-            client.send_message('@He1per_4u_bot', '/Url')
-            time.sleep(2)
-            messages = client.get_messages('@He1per_4u_bot')
-            for message in client.get_messages('@He1per_4u_bot', limit=1):
-                m = message.message
-            self.assertEqual(len(messages), 1)
-            text = f'Выберите сайт, на который вы хотите перейти'
-            self.assertRegex(m, text)
-        except:
-            self.assertFalse(True)
-
-    def testurl3(self):
-        try:
-            client.send_message('@He1per_4u_bot', '/u')
-            time.sleep(2)
-            messages = client.get_messages('@He1per_4u_bot')
-            for message in client.get_messages('@He1per_4u_bot', limit=1):
-                m = message.message
-            self.assertEqual(len(messages), 1)
-            text = f'Выберите сайт, на который вы хотите перейти'
-            self.assertRegex(m, text)
-        except:
-            self.assertFalse(True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @mock.patch('bot.bot')
+    def test_start(self, bot_bot):
+        name = 'test'
+        user = MagicMock(first_name=name)
+        chat = MagicMock(id=123)
+        message = MagicMock(from_user=user, chat=chat)
+        bot_bot.get_me.return_value = MagicMock(first_name='bot')
+        bot.start_message(message)
+        calls = [
+            call(123, "Добро пожаловать, test!\nЯ - <b>bot</b>, бот созданный, чтобы упростить жизнь моего создателя.",
+                 parse_mode='html'),
+            call(123, "Я могу устанавливать таймеры с нужной для вас информацией", reply_markup=ANY),
+            call(123, "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")]
+        bot_bot.send_message.assert_has_calls(calls)

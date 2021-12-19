@@ -2,7 +2,7 @@ import telebot
 import threading
 import datetime
 import xlrd
-from config import TOKEN
+TOKEN = '2113108728:AAFBB4BWkoi3biHM7VQE7gX8X6k-eSFWq9M'
 bot = telebot.TeleBot(TOKEN)
 """раздел, обрабатывающий команду Start"""
 @bot.message_handler(commands=['start'])
@@ -24,20 +24,6 @@ def start_message(message): #функция, обрабатывающая ком
     bot.send_message(message.chat.id,
                      "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")
 
-@bot.message_handler(commands=['url', 'Url', 'u'])
-def url(message):
-    """
-    Функция обрабатывает команду /url, /Url, /u
-    :param message: сообщение
-    :return: три кнопки, привязпнные к сообщению
-    """
-    keyboard = telebot.types.InlineKeyboardMarkup(row_width=1)
-    url_button1 = telebot.types.InlineKeyboardButton(text="Расписание", url="https://ruz.hse.ru/ruz/main")
-    url_button2 = telebot.types.InlineKeyboardButton(text="Библиотека", url="https://library.hse.ru/")
-    url_button3 = telebot.types.InlineKeyboardButton(text="Smart LMS", url="https://smartedu.hse.ru/login?target=/")
-    keyboard.add(url_button1, url_button2, url_button3)
-    bot.send_message(message.chat.id,
-                     'Выберите сайт, на который вы хотите перейти', reply_markup=keyboard)
 
 @bot.callback_query_handler(func=lambda x: x.data == "set timer")
 def presettimer(query):
@@ -105,6 +91,7 @@ def check_date():
         message = value[1]
         if nowdate >= timer:
             bot.send_message(chat_id, "Ваше напоминание: \n" + message)
+
             delusers.append(chat_id)
     for user in delusers:
         del users[user]
@@ -120,7 +107,7 @@ def get_keyboard():
     keyboard.add(button)
     return keyboard
 @bot.message_handler(commands=['books', 'Books', 'notes', 'Notes'])
-def send_welcome(message):
+def menu(message):
     '''
 
     :param message: команда, которая запускает данную функцию
@@ -128,10 +115,17 @@ def send_welcome(message):
     '''
     keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
     button1 = telebot.types.KeyboardButton("Вывести заметки из Exel")
+
     button2 = telebot.types.KeyboardButton("Книги")
     keyboard.add(button1, button2)
 
+    url_keyboard = telebot.types.InlineKeyboardMarkup(row_width=1)
+    url_button1 = telebot.types.InlineKeyboardButton(text="Расписание", url="https://ruz.hse.ru/ruz/main")
+    url_button2 = telebot.types.InlineKeyboardButton(text="Библиотека", url="https://library.hse.ru/")
+    url_button3 = telebot.types.InlineKeyboardButton(text="Smart LMS", url="https://smartedu.hse.ru/login?target=/")
+    url_keyboard.add(url_button1, url_button2, url_button3)
     bot.send_message(message.chat.id, "Выбирай, {0.first_name}\n".format(message.from_user),parse_mode='html', reply_markup=keyboard)
+    bot.send_message(message.chat.id, "Или можешь выбрать один из сайтов, которые нужны студенту вышки", reply_markup=url_keyboard)
 @bot.message_handler(func=lambda message: True)
 def choose(message):
     """
@@ -139,19 +133,32 @@ def choose(message):
     :param message: на вход идет либо "книги", либо "вывести заметки из Exel"
     :return: выводит либо содержимое таблицы Exel, либо список книг
     """
+    keyboard = telebot.types.InlineKeyboardMarkup(row_width=1)
+    url_button1 = telebot.types.InlineKeyboardButton(text="Физика", url="http://4ipho.ru/data/documents/Sivuhin_I.pdf")
+    url_button2 = telebot.types.InlineKeyboardButton(text="Основы Pyton", url="https://login.proxylibrary.hse.ru/login?qurl=https://ibooks.ru%2fproducts%2f22296")
+
+    keyboard.add(url_button1, url_button2)
     if message.chat.type == "private":
         if message.text == "Вывести заметки из Exel":
             notes = xlrd.open_workbook('Notes.xls', formatting_info=True)
-            list = notes.sheet_by_index(0)
-            for i in range(list.nrows):
-                row = list.row_values(i)
+            sheet = notes.sheet_by_index(0)
+
+            for i in range(sheet.nrows):
+                row = sheet.row_values(i)
                 bot.send_message(message.chat.id, row)
+        elif message.text == "Exel":
+            notes = xlrd.open_workbook('Notes.xls', formatting_info=True)
+            sheet = notes.sheet_by_index(0)
+            sheet.write(0, sheet.nrows, message)
+            notes.save("Notes.xls")
+            bot.send_message(message.chat.id, "Заметка добавлена")
         elif message.text == "Книги":
             bot.send_message(message.chat.id, "Выбор не велик, но библиотека постоянно пополняется!\n"
-                                              "И.Сивухин. Основной курс физики\n"
-                                              "Акулов. Курс по информатике")
+                                              "1) И.Сивухин. Основной курс физики\n"
+                                              "2) Основы Pyton", reply_markup=keyboard)
         else:
             bot.send_message(message.chat.id, "Затрудняюсь ответить")
+
 if __name__ == "__main__":
     users = {}
     while True:
