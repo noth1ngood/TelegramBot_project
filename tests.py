@@ -14,6 +14,7 @@ class TG_test(unittest.TestCase):
         message = MagicMock(from_user=user, chat=chat)
         bot_bot.get_me.return_value = MagicMock(first_name='bot')
         bot.start_message(message)
+
         calls = [call(123, "Добро пожаловать, test!\nЯ - <b>bot</b>, бот созданный, чтобы упростить жизнь моего создателя.", parse_mode='html'),
                  call(123, "Я могу устанавливать таймеры с нужной для вас информацией", reply_markup=ANY),
                  call(123, "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")]
