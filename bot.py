@@ -53,10 +53,11 @@ def settime(message):
     if type_time not in times.keys():
         bot.send_message(message.chat.id,
                          'Вы ввели неверный тип времени')
-
+        return
     if not kolvo.isdigit():
         bot.send_message(message.chat.id,
                          'Вы ввели не численнленное значение времени')
+        return
     times[type_time] = int(kolvo)
 
     bot.send_message(message.chat.id,
@@ -146,12 +147,7 @@ def choose(message):
             for i in range(sheet.nrows):
                 row = sheet.row_values(i)
                 bot.send_message(message.chat.id, row)
-        elif message.text == "Exel":
-            notes = xlrd.open_workbook('Notes.xls', formatting_info=True)
-            sheet = notes.sheet_by_index(0)
-            sheet.write(0, sheet.nrows, message)
-            notes.save("Notes.xls")
-            bot.send_message(message.chat.id, "Заметка добавлена")
+
         elif message.text == "Книги":
             bot.send_message(message.chat.id, "Выбор не велик, но библиотека постоянно пополняется!\n"
                                               "1) И.Сивухин. Основной курс физики\n"
