@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import unittest
-
 from unittest import mock
 from unittest.mock import MagicMock, ANY, call
 import bot
@@ -65,8 +64,8 @@ class TG_test(unittest.TestCase):
         bot.choose(message)
 
         bot_bot.send_message.assert_called_with(123, "Выбор не велик, но библиотека постоянно пополняется!\n"
-                                              "1) И.Сивухин. Основной курс физики\n"
-                                              "2) Основы Pyton", reply_markup=ANY)
+                                                     "1) И.Сивухин. Основной курс физики\n"
+                                                     "2) Основы Pyton", reply_markup=ANY)
 
     @mock.patch('bot.bot')
     def test_choose(self, bot_bot):
@@ -87,8 +86,20 @@ class TG_test(unittest.TestCase):
         chat = MagicMock(id=123)
         message = MagicMock(from_user=user, chat=chat)
         bot.users = dict()
-        times= {'сек': 5, 'мин': 0, 'час': 0}
+        times = {'сек': 5, 'мин': 0, 'час': 0}
         bot_bot.get_me.return_value = MagicMock(first_name='bot')
         bot.settext(message, times)
         bot_bot.send_message.assert_called_with(123, "Через заданное время вам придет заданный текст")
 
+    @mock.patch("bot.bot")
+    def test_menu(self, bot_bot):
+        name = 'test'
+        user = MagicMock(first_name=name)
+        chat = MagicMock(id=123)
+        message = MagicMock(from_user=user, chat=chat)
+        bot_bot.get_me.return_value = MagicMock(first_name='bot')
+        bot.menu(message)
+
+        calls = [call(123, "Выбирай, test", parse_mode='html', reply_markup=ANY),
+                 call(123, "Или можешь выбрать один из сайтов, которые нужны студенту вышки", reply_markup=ANY)]
+        bot_bot.send_message.assert_has_calls(calls)

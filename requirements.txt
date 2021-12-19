@@ -1,2 +1,5 @@
 DateTime~=4.3
 xlrd~=2.0.1
+TelegramBotApi~=0.3.2
+threading
+unittest

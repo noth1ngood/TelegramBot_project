@@ -15,14 +15,16 @@ def start_message(message): #функция, обрабатывающая ком
     """
 
     bot.send_message(message.chat.id,
-                     "Добро пожаловать, {0.first_name}!\nЯ - <b>{1.first_name}</b>, бот созданный, чтобы упростить жизнь моего создателя.".format(
+                     "Добро пожаловать, {0.first_name}!\n"
+                     "Я - <b>{1.first_name}</b>, бот созданный, чтобы упростить жизнь моего создателя.".format(
                          message.from_user, bot.get_me()),
                      parse_mode='html')
     bot.send_message(message.chat.id,
                      "Я могу устанавливать таймеры с нужной для вас информацией",
                      reply_markup=get_keyboard())
     bot.send_message(message.chat.id,
-                     "Либо открывать сайты нужные для студента ВШЭ.\nДля этого введите команду url")
+                     "Либо открывать сайты нужные для студента ВШЭ.\n"
+                     "Для этого введите команду url")
 
 
 @bot.callback_query_handler(func=lambda x: x.data == "set timer")
@@ -125,7 +127,7 @@ def menu(message):
     url_button2 = telebot.types.InlineKeyboardButton(text="Библиотека", url="https://library.hse.ru/")
     url_button3 = telebot.types.InlineKeyboardButton(text="Smart LMS", url="https://smartedu.hse.ru/login?target=/")
     url_keyboard.add(url_button1, url_button2, url_button3)
-    bot.send_message(message.chat.id, "Выбирай, {0.first_name}\n".format(message.from_user),parse_mode='html', reply_markup=keyboard)
+    bot.send_message(message.chat.id, "Выбирай, {0.first_name}".format(message.from_user, bot.get_me()),parse_mode='html', reply_markup=keyboard)
     bot.send_message(message.chat.id, "Или можешь выбрать один из сайтов, которые нужны студенту вышки", reply_markup=url_keyboard)
 @bot.message_handler(func=lambda message: True)
 def choose(message):
