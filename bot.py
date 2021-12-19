@@ -2,9 +2,14 @@ import telebot
 import threading
 import datetime
 import xlrd
-TOKEN = '2113108728:AAFBB4BWkoi3biHM7VQE7gX8X6k-eSFWq9M'
+from config import TOKEN
 bot = telebot.TeleBot(TOKEN)
-"""раздел, обрабатывающий команду Start"""
+"""
+    для ознакомления с работой телеграмм бота и его созданием я использовал следующие источники:
+    1) https://www.youtube.com/watch?v=M8fhrtvedHA -- общие знания по созданию ботов
+    2) https://russianblogs.com/article/27471672547/ -- документация по библиотеке xlrd
+    3) https://mastergroosha.github.io/telegram-tutorial/docs/lesson_08/ -- описание создания клавиатур
+"""
 @bot.message_handler(commands=['start'])
 def start_message(message): #функция, обрабатывающая команду start
 
@@ -81,7 +86,7 @@ def settext(message, times):
     bot.send_message(message.chat.id,
                      'Через заданное время вам придет заданный текст')
 
-def check_date():
+def check_date():  #данная функция была заимствована, источник: https://www.youtube.com/watch?v=sXkGDlSvWd4&t=1155s
     """
     Функция следит за наступлением времени, при котором надо бдует отправить уведомление, также чтобы не захламлять память
     она удаляет из users все данные
@@ -102,7 +107,7 @@ def check_date():
 
 def get_keyboard():
     """
-
+    функция создает клавиатуру
     :return: возвращает клавиатуру
     """
     keyboard = telebot.types.InlineKeyboardMarkup()
@@ -112,7 +117,7 @@ def get_keyboard():
 @bot.message_handler(commands=['books', 'Books', 'notes', 'Notes'])
 def menu(message):
     '''
-
+    функция описывает создание клавиатуры и отправки двух сообщений пользователю
     :param message: команда, которая запускает данную функцию
     :return: клавиатуру, с двумя кнопками
     '''
@@ -132,7 +137,10 @@ def menu(message):
 @bot.message_handler(func=lambda message: True)
 def choose(message):
     """
-
+    Функция создает клавиатуру с url ссылками, при нажатии которых происходит переход
+    по этим ссылкам. Далее рассматривается вторая клавиатура, при нажатии кнопок выполняются определенные действия.
+    1 - бот отправляет записанные заметки в файл Exel
+    2 - открывает 3 клавиатуру с 2 инлайновыми кнопками с прикрепленными ссылками
     :param message: на вход идет либо "книги", либо "вывести заметки из Exel"
     :return: выводит либо содержимое таблицы Exel, либо список книг
     """
